@@ -10,7 +10,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import br.com.financial_manager.trabalho.Dados.Gasto;
 
@@ -19,6 +18,7 @@ public class AbaTabelaGastos extends JPanel{
     private PainelTabelaGastos painelTabelaGastos;
     private JButton filtrarButton = new JButton("Filtrar");
     ComboBoxCategorias comboBoxCategorias = new ComboBoxCategorias(new String[] { "", "Comida", "Lazer", "Educação", "Saúde", "Transporte", "Outros"});
+    ComboBoxCategorias comboBoxMes = new ComboBoxCategorias(new String[] { "", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
 
     public AbaTabelaGastos(Principal principal) {
         painelTabelaGastos = new PainelTabelaGastos(principal);
@@ -50,12 +50,12 @@ public class AbaTabelaGastos extends JPanel{
         textFiltroPanel.setLayout(new GridLayout(1, 3));
     
 
-        JTextField textFieldMes = new JTextField(40);
-        textFiltroPanel.add(textFieldMes);
+        // JTextField textFieldMes = new JTextField(40);
+        textFiltroPanel.add(comboBoxMes);
         
         filtrarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                String mesAux = textFieldMes.getText();
+                String mesAux = (String) comboBoxMes.getComboBox().getSelectedItem();
 
                 int mes = 0;
                 if (mesAux.matches("\\d{1,2}")) {

@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -21,7 +22,7 @@ public class Login extends JFrame {
 
     public Login(Principal telaPrincipal) {
         setTitle("Login");
-        setBounds(50, 50, 1200, 150);
+        setBounds(50, 50, 600, 150);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         setBackground(Color.DARK_GRAY);
@@ -35,6 +36,9 @@ public class Login extends JFrame {
                     telaPrincipal.setVisible(true);
                     dispose();
                 }
+                else {
+                    JOptionPane.showMessageDialog(telaPrincipal, "Credenciais inválidas!");
+                }
 
             }
         });
@@ -45,12 +49,10 @@ public class Login extends JFrame {
                 Usuario tentativa = new Usuario(textFieldNome.getText(), textFieldSenha.getText());
 
                 if (telaPrincipal.sistema.cadastrarUsuario(tentativa)) {
-                    setVisible(false);
-                    telaPrincipal.setVisible(true);
-                    dispose();
+                    JOptionPane.showMessageDialog(telaPrincipal, "Usuário cadastrado!");
                 }
                 else {
-                    labelConfirmacao.setText("            Credenciais inválidas");
+                    JOptionPane.showMessageDialog(telaPrincipal, "Erro ao cadastrar usuario");
                 }
             }
         });
