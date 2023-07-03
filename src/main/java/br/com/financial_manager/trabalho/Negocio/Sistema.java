@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import br.com.financial_manager.trabalho.Dados.*;
+import br.com.financial_manager.trabalho.Persistencia.GastoDAO;
+import br.com.financial_manager.trabalho.Persistencia.UsuarioDAO;
 
 public class Sistema {
     private Usuario usuarioLogado;
+    private GastoDAO gastoDao;
+    private UsuarioDAO usuarioDao;
 
     private List<Usuario>   usuarios; 
     private List<Gasto>     gastos;
@@ -15,55 +19,62 @@ public class Sistema {
     public Sistema() {
         usuarios = new ArrayList<>();
         gastos = new ArrayList<>();
+
+        try {
+            gastoDao = GastoDAO.getInstace();
+            usuarioDao = UsuarioDAO.getInstance();
+        } catch (Exception ex) {System.out.println("Erro ao estabelecer conexao com o DB -> " + ex);}
+
+
     }
 
     public boolean cadastrarUsuario(Usuario usuario) {
-        if (usuarios.contains(usuario) || usuario.getNome().equals("") || usuario.getSenha().equals("")) {
-            return false;
-        }
+        //Se ja existe
+        try {
+            if (usuarioDao.validate(usuario.getNome(), usuario.getSenha())) {
+                return false;
+            }
+        } catch(Exception ex) {return false;}
 
-        usuarios.add(usuario);
+        //Adiciona usuario
+        try {
+            usuarioDao.insert(usuario.getNome(), usuario.getSenha());
+        } catch(Exception ex) {return false;}
         return true;
     }
 
     public boolean login(String nome, String senha) {
-        Usuario tentativa = new Usuario(nome, senha);
-
-        if (usuarios.contains(tentativa)) {
-            Usuario usuario = usuarios.stream().filter((Usuario user) -> user.getNome().equals(tentativa.getNome())).collect(Collectors.toList()).get(0);
-            
-            if (usuario.login(tentativa)) {
-                usuarioLogado = tentativa;
+        try {
+            if (usuarioDao.validate(nome, senha)) {
                 return true;
             }
-        }
+        } catch(Exception ex) {return false;}
 
         return false;
     }
 
     public void adicionarGasto(Gasto gasto) {
-            gastos.add(gasto);
+        try {
+            GastoDAO.getInstace().insert(gasto);
+        } catch (Exception e) {System.out.println("Erro ao inserir gasto no banco -> " + e);}
     }
 
-    public boolean alterarGasto(Gasto gasto, Gasto gastoAlterado) {
-        if (gastos.contains(gasto)) {
-            gastos.remove(gasto);
-            gastos.add(gastoAlterado);
-
-            return true;
-        }
-
-        return false;
+    public Gasto getGasto(int idGasto) throws Exception{
+        return gastoDao.select(idGasto);
     }
 
-    public boolean removerGasto(Gasto gasto) {
-        if (gastos.contains(gasto)) {
-            gastos.remove(gasto);
-            
+    public boolean alterarGasto(int codigo, Gasto gastoAlterado) {
+        try {
+            gastoDao.update(codigo, gastoAlterado);
             return true;
-        }
+        } catch (Exception ex) {return false;}
+    }
 
-        return false;
+    public boolean removerGasto(int codigo) {
+        try {
+            gastoDao.delete(codigo);
+            return true;
+        } catch (Exception ex) {return false;}
     }
 
     public Usuario getUsuarioLogado() {

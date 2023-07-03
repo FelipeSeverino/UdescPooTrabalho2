@@ -9,9 +9,12 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import br.com.financial_manager.trabalho.Dados.Gasto;
+import br.com.financial_manager.trabalho.Persistencia.Conexao;
+import br.com.financial_manager.trabalho.Persistencia.GastoDAO;
 
 public class AbaTabelaGastos extends JPanel{
 
@@ -19,6 +22,7 @@ public class AbaTabelaGastos extends JPanel{
     private JButton filtrarButton = new JButton("Filtrar");
     ComboBoxCategorias comboBoxCategorias = new ComboBoxCategorias(new String[] { "", "Comida", "Lazer", "Educação", "Saúde", "Transporte", "Outros"});
     ComboBoxCategorias comboBoxMes = new ComboBoxCategorias(new String[] { "", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"});
+
 
     public AbaTabelaGastos(Principal principal) {
         painelTabelaGastos = new PainelTabelaGastos(principal);
@@ -70,22 +74,26 @@ public class AbaTabelaGastos extends JPanel{
                 }
 
                 List<Gasto> listaFiltrada = new ArrayList<>();
-                for (Gasto gasto : principal.sistema.getGastos()) {
-                    int mesGasto = Integer.parseInt(gasto.getData().substring(3, 5));
-                    
-                    if (mes != 0 && mes != mesGasto) {
-                        continue;
+                try {
+                    GastoDAO gastoDao = GastoDAO.getInstace();
+                    List<Gasto> gastos = gastoDao.selectAllGasto();
+                    for (Gasto gasto : gastos) {
+                        int mesGasto = Integer.parseInt(gasto.getData().substring(3, 5));
+                        
+                        if (mes != 0 && mes != mesGasto) {
+                            continue;
+                        }
+    
+                        if (!categoria.equals("") && !categoria.equals(gasto.getCategoria())) {
+                            continue;
+                        }
+    
+                        listaFiltrada.add(gasto);
                     }
-
-                    if (!categoria.equals("") && !categoria.equals(gasto.getCategoria())) {
-                        continue;
-                    }
-
-                    listaFiltrada.add(gasto);
-                }
-
-                painelTabelaGastos.getTabelaGastos().setListaGasto(listaFiltrada);
-                painelTabelaGastos.getTabelaGastos().fireTableStructureChanged();
+    
+                    painelTabelaGastos.getTabelaGastos().setListaGasto(listaFiltrada);
+                    painelTabelaGastos.getTabelaGastos().fireTableStructureChanged();
+                } catch (Exception ex) {JOptionPane.showMessageDialog(principal, "Erro ao filtrar lista");}
             }
         });
         textFiltroPanel.add(filtrarButton);

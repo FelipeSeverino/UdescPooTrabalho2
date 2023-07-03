@@ -5,12 +5,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Gasto {
+    private int codigo;
     private String nome;
     private Date data;
     private String descricao;
     private double valor;
     private String categoria;
     
+    public Gasto() {}
+
     public Gasto(String nome, Date data, String descricao, double valor, String categoria) {
         this.nome = nome;
         this.data = data;
@@ -37,6 +40,10 @@ public class Gasto {
         this.data = data;
     }
 
+    public Date getDate() {
+        return data;
+    }
+
     public String getDescricao() {
         return descricao;
     }
@@ -60,6 +67,8 @@ public class Gasto {
     public void setCategoria(String categoria) {
         this.categoria = categoria;
     } 
+    
+    
 
     @Override
     public boolean equals(Object obj) {
@@ -73,5 +82,13 @@ public class Gasto {
         }
 
         return false;
+    }
+
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
     }
 }

@@ -49,15 +49,24 @@ public class AbaRemoverEditarGastos extends JPanel {
         buttonBuscar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 codigo = Integer.parseInt(textCodigo.getText());
-                Gasto gasto = principal.sistema.getGastos().get(codigo);
+                //Gasto gasto = principal.sistema.getGastos().get(codigo);
+                try {
+                    Gasto gasto = principal.sistema.getGasto(codigo);
 
-                textFieldNome.setText(gasto.getNome());
-                textFieldData.setText(gasto.getData());
-                textFieldDescricao.setText(gasto.getDescricao());
-                textFieldValor.setText(String.valueOf(gasto.getValor()));
-                // textFieldCategoria.setText(gasto.getCategoria());
-
-                comboBoxCategoria.getComboBox().setSelectedItem(gasto.getCategoria());
+                    textFieldNome.setText(gasto.getNome());
+                    textFieldData.setText(gasto.getData());
+                    textFieldDescricao.setText(gasto.getDescricao());
+                    textFieldValor.setText(String.valueOf(gasto.getValor()));
+                    // textFieldCategoria.setText(gasto.getCategoria());
+    
+                    comboBoxCategoria.getComboBox().setSelectedItem(gasto.getCategoria());
+                } catch (Exception ex) {
+                    textFieldNome.setText("");
+                    textFieldData.setText("");
+                    textFieldDescricao.setText("");
+                    textFieldValor.setText("");
+                    JOptionPane.showMessageDialog(principal, "Codigo invalido!");
+                }
             }
         });
 
@@ -95,23 +104,23 @@ public class AbaRemoverEditarGastos extends JPanel {
 
         buttonRemover.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                principal.sistema.getGastos().remove(codigo);
-                principal.gastosObserver();
+                if (principal.sistema.removerGasto(codigo)) {
+                    JOptionPane.showMessageDialog(principal, "Gasto removido!");
+                }
+                else {JOptionPane.showMessageDialog(principal, "Codigo invalido!");}
 
+                principal.gastosObserver();
                 textFieldNome.setText("");
                 textFieldData.setText("");
                 textFieldDescricao.setText("");
                 textFieldValor.setText("");
                 comboBoxCategoria.getComboBox().setSelectedItem("");
 
-                JOptionPane.showMessageDialog(principal, "Gasto removido");
             }
         });
 
         buttonEditar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                Gasto gasto = principal.sistema.getGastos().get(codigo);
-
                 Date data = null;
                 try {
                     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -119,13 +128,18 @@ public class AbaRemoverEditarGastos extends JPanel {
                 }
                 catch (Exception ex) {}
 
+                Gasto gasto = new Gasto();
                 gasto.setNome(textFieldNome.getText());
                 gasto.setData(data);
                 gasto.setDescricao(textFieldDescricao.getText());
                 gasto.setValor(Double.parseDouble(textFieldValor.getText()));
                 gasto.setCategoria((String) comboBoxCategoria.getComboBox().getSelectedItem());
 
-                principal.gastosObserver();
+                if (principal.sistema.alterarGasto(codigo, gasto)) {
+                    principal.gastosObserver();
+                    JOptionPane.showMessageDialog(principal, "Gasto editado!");
+                }
+                else {JOptionPane.showMessageDialog(principal, "Erro ao editar gasto!");}
 
                 textFieldNome.setText("");
                 textFieldData.setText("");
@@ -133,7 +147,6 @@ public class AbaRemoverEditarGastos extends JPanel {
                 textFieldValor.setText("");
                 comboBoxCategoria.getComboBox().setSelectedItem("");
 
-                JOptionPane.showMessageDialog(principal, "Gasto editado");
             }
         });
 

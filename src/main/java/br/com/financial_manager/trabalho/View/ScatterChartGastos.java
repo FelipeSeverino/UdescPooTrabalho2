@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
@@ -18,41 +19,44 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import br.com.financial_manager.trabalho.Dados.Gasto;
+import br.com.financial_manager.trabalho.Persistencia.GastoDAO;
 
 public class ScatterChartGastos extends JPanel{
     private Principal principal = null;
+    private GastoDAO gastoDao = null;
 
     public ScatterChartGastos(Principal principal) {
         this.principal = principal;
-
-        // based on the dataset we create the chart
-        JFreeChart chart = ChartFactory.createScatterPlot("Gastos anuais", "Mes", "Gasto", createDataset(),
-        PlotOrientation.VERTICAL, true, true, true);
-
-        // Changes background color
-        XYPlot plot = (XYPlot) chart.getPlot();
-        plot.setBackgroundPaint(new Color(255, 228, 196));
-
-        // Adding chart into a chart panel
-        ChartPanel chartPanel = new ChartPanel(chart);
-
-        // settind default size
-        chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
-
-        setLayout(new GridLayout(1, 1));
-        add(chartPanel);
-
-        
+        try {
+            gastoDao = GastoDAO.getInstace();
+    
+            // based on the dataset we create the chart
+            JFreeChart chart = ChartFactory.createScatterPlot("Gastos anuais", "Mes", "Gasto", createDataset(),
+            PlotOrientation.VERTICAL, true, true, true);
+    
+            // Changes background color
+            XYPlot plot = (XYPlot) chart.getPlot();
+            plot.setBackgroundPaint(new Color(255, 228, 196));
+    
+            // Adding chart into a chart panel
+            ChartPanel chartPanel = new ChartPanel(chart);
+    
+            // settind default size
+            chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
+    
+            setLayout(new GridLayout(1, 1));
+            add(chartPanel);
+        } catch(Exception ex) {JOptionPane.showConfirmDialog(principal, "Erro ao carregar grafico");}
     }
 
-    private XYDataset createDataset() {
+    private XYDataset createDataset() throws Exception{
 
         // create the dataset...
         final XYSeriesCollection dataset = new XYSeriesCollection();
     
         XYSeries gastosMensais = new XYSeries("Ano");
         
-        List<Gasto> gastos = principal.sistema.getGastos();
+        List<Gasto> gastos = gastoDao.selectAllGasto();
         Map<Integer, Double> mapGastos = new HashMap<>();
 
         for (Gasto gasto : gastos) {
